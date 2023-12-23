@@ -100,7 +100,51 @@ def initialize_Astar(m, n, sr, sc, gr, gc, k):
 
 
 def Astar():
-   
+    def explore_actions():
+        return [(0, 1), (-1, 0), (0, -1), (1, 0)]
     
     
-    return 0  # TODO
+    def EuclideanDistance(start, goal):
+        return ((goal[0] - start[0])**2 + (goal[1] - start[1])**2 ) ** 0.5
+    
+    magical_blade = magic_blade
+    priority_queue = []
+    visited = []
+
+    start_grid = ((start_row, start_col), magical_blade, 0, 0)
+    goal = (goal_row, goal_col)
+
+    priority_queue.append(start_grid)
+
+    while True:
+        current = min(priority_queue, key=lambda node: node[2])
+        magical_blade = current[1]
+        
+        priority_queue.remove(current)
+
+        if current[0] == (goal_row, goal_col):
+            return current[3]
+        
+        if (current[0], magical_blade) not in visited:
+            visited.append((current[0], magical_blade))
+            
+            directions = explore_actions()
+            for index in range(len(directions)):
+                checking = tuple(map(sum, zip(directions[index], current[0])))
+                if 1 <= checking[0] < (maze_row - 1) and 1 <= checking[1] < (maze_col - 1):
+                    value = explore(checking[0], checking[1])
+                    if value == "X" and magical_blade > 0:
+                        value = "0"
+                        magical_blade -= 1
+                    if value == "S" or value == "G":
+                        value = "0"
+                    if value.isdigit():
+                        value = int(value)
+                    if value != "X":
+                        gn = value + current[3]
+                        hn = EuclideanDistance(checking, goal)
+                        fn = gn + hn
+                        priority_queue.append((checking, magical_blade, fn, gn))
+
+
+
